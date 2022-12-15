@@ -51,6 +51,7 @@
     <memberTool name="sortNodeInputs"/>
     <memberTool name="restartPlayback"/>
     <memberTool name="goToFirstFrame"/>
+    <memberTool name="tool_1"/>
   </toolshelf>
 
   <tool name="selectNearestNode" label="Select Nearest Node" icon="SOP_polyextrude">

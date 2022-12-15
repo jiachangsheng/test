@@ -694,7 +694,6 @@ def sortNodeInputs(nodes=None):
                 node.setInput(index, sortedInputs[index])
 
 
-
 def pointLineProjection(pt, linept0, linept1):
     direction = linept1 - linept0
     pp = pt - linept0

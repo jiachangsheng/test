@@ -390,8 +390,8 @@ class HDATableWidget(QtWidgets.QTableWidget):
             self.setItem(index, 8, current)
             
         if highlightRow:
-            #self.selectRow(highlightIndex)
-            print highlightIndex
+            self.selectRow(highlightIndex)
+            #print highlightIndex
             self.scrollToItem(self.selectRow(highlightIndex), QtWidgets.QAbstractItemView.PositionAtTop)
         else:
             self.scrollToTop()
@@ -411,7 +411,7 @@ class HDATableWidget(QtWidgets.QTableWidget):
     def mouseDoubleClickEvent(self, event):
         widget = self.childAt(event.pos())
         if widget is not None and widget.objectName():
-            print "double click"
+            #print "double click"
             
             
 

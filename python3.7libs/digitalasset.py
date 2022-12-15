@@ -24,24 +24,18 @@ class DigitalAsset:
         self.version = 0
         if components[3]:
             self.version = components[3]
-    
-    
 
     def getQtIcon(self):
         return getQtIcon(self.getDefinition())
-
-
 
     def getDefinition(self):
         hdas = hou.hda.definitionsInFile(self.path)
         for hda in hdas:
             if hda.nodeTypeName() == self.fulltypename:
                 return hda
-                
+
         return None
-        
-        
-        
+
     def isCurrent(self):
         hdadef = self.getDefinition()
         if hdadef:

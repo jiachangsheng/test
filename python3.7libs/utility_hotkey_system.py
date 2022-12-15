@@ -13,8 +13,6 @@ from collections import defaultdict
 from nodegraphpopupmenus import MenuProvider
 import nodegraphbase as base
 
-
-
 this = sys.modules[__name__]
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -23,9 +21,11 @@ hotkeysfile = os.path.join(currentdir, "..", "hotkeys.csv")
 showstatus = False
 
 __actions = None
+
+
 def __load_actions():
     if showstatus:
-        print ("Reloading hotkeys...")
+        print("Reloading hotkeys...")
 
     global __actions
     __actions = defaultdict(lambda: defaultdict(list))
@@ -35,6 +35,8 @@ def __load_actions():
             for context in ("OBJECT", "SOP", "VOP", "DOP", "COP2", "CHOP", "SHOP", "DRIVER", "TOP", "LOP"):
                 if row[context] != '':
                     __actions[context][row["Key Name"]].append(row[context])
+
+
 __load_actions()
 
 this.fs_watcher = QtCore.QFileSystemWatcher()
@@ -42,7 +44,6 @@ this.fs_watcher.addPath(hotkeysfile)
 this.fs_watcher.fileChanged.connect(__load_actions)
 
 showstatus = True
-
 
 
 def invokeActionFromKey(uievent):
@@ -73,18 +74,17 @@ def invokeActionFromKey(uievent):
     return None, False
 
 
-
 class CustomMouseHandler(base.EventHandler):
     def handleEvent(self, uievent, pending_actions):
-        print (uievent.eventtype)
-        #if uievent.eventtype == 'keyhit':
-            #print ("keyhit invoke")
-            #return invokeActionFromKey(uievent, ContextActions)
-        #if uievent.eventtype == 'mouseup':
-            #print ("MOUSE UP")
-            #return None, True
-        #return self
+        print(uievent.eventtype)
+        # if uievent.eventtype == 'keyhit':
+        # print ("keyhit invoke")
+        # return invokeActionFromKey(uievent, ContextActions)
+        # if uievent.eventtype == 'mouseup':
+        # print ("MOUSE UP")
+        # return None, True
 
+        # return self
 
 
 def getPopupMenuResult(menu_provider, uievent, context):
@@ -97,10 +97,9 @@ def getPopupMenuResult(menu_provider, uievent, context):
         buildMenu(menu, menu_provider.title, menu_provider.menuitems, context)
         result = menu.exec_(QtCore.QPoint(QtGui.QCursor.pos()))
         if result is not None:
-           result = result.data()
+            result = result.data()
 
     return result
-
 
 
 # At least on mac, keyboard shortcuts for menus added to the main window
@@ -113,11 +112,9 @@ class FixKeyPressBugMenu(QtWidgets.QMenu):
         self.context = context
         self.triggered.connect(self.actionClicked)
 
-
     def actionClicked(self, action):
         executeActionString(self.uievent, action.data(), self.context, bypassKeyboardModifiers=True)
         return True
-
 
     def keyPressEvent(self, event):
         for action in self.actions():
@@ -127,7 +124,6 @@ class FixKeyPressBugMenu(QtWidgets.QMenu):
                 return True
 
         super(FixKeyPressBugMenu, self).keyPressEvent(event)
-
 
 
 def buildMenu(menu, title, menuitems, context):
@@ -173,7 +169,6 @@ def buildMenu(menu, title, menuitems, context):
             buildMenu(submenu, None, item[1])
 
 
-
 def getActiveModifierStates(mousestate, modifierstate):
     mods = []
     selectionMods = ""
@@ -188,14 +183,14 @@ def getActiveModifierStates(mousestate, modifierstate):
     if getSessionVariable("spaceKeyIsDown") and hou.session.spaceKeyIsDown:
         mods.append('P')
 
-    #if bool(mousestate.lmb):
+    # if bool(mousestate.lmb):
     #    mods.append('L')
-    #if bool(mousestate.rmb):
+    # if bool(mousestate.rmb):
     #    mods.append('R')
-    #if bool(mousestate.mmb):
+    # if bool(mousestate.mmb):
     #    mods.append('M')
 
-    #if isCapsLockOn():
+    # if isCapsLockOn():
     #    mods.append('CL')
 
     if len(hou.selectedNodes()) > 0:
@@ -206,14 +201,13 @@ def getActiveModifierStates(mousestate, modifierstate):
     return " ".join(sorted(mods)), selectionMods
 
 
-
 def getModifiersFromActionString(action):
     mods = ""
     selectionMods = ""
 
     index = action.find('<')
     if index != -1:
-        mods = action[index+1:-1]
+        mods = action[index + 1:-1]
         mods = sorted(mods.split(" "))
 
         if "SE" in mods:
@@ -229,10 +223,9 @@ def getModifiersFromActionString(action):
     return mods, selectionMods
 
 
-
 def performAction(uievent, context, action):
     success = False
-    
+
     opcode = action[:2]
     opfunc = action[3:]
     index = opfunc.find('<')
@@ -254,10 +247,9 @@ def performAction(uievent, context, action):
             getPopupMenuResult(menu, uievent, context)
             success = True
         except Exception as e:
-            print (e)
+            print(e)
 
     return success
-
 
 
 def executeActionString(uievent, action, context, bypassKeyboardModifiers=False, debug=False):
@@ -275,7 +267,7 @@ def executeActionString(uievent, action, context, bypassKeyboardModifiers=False,
     actionWithoutMods = []
     for a in actions:
         if debug:
-            print (a)
+            print(a)
 
         #   First separate actions with explicit modifiers (Ctrl, Alt, Shift, Space, LMB, RMB, MMB)
         currentmods, currentSelectionMods = getModifiersFromActionString(a)
@@ -289,10 +281,10 @@ def executeActionString(uievent, action, context, bypassKeyboardModifiers=False,
             actionWithoutMods.append(a)
 
     if debug:
-        print ("actionsWithModsSelection", actionsWithModsSelection)
-        print ("actionsWithModsNoSelection", actionsWithModsNoSelection)
-        print ("actionsWithSelection", actionsWithSelection)
-        print ("actionWithoutMods", actionWithoutMods)
+        print("actionsWithModsSelection", actionsWithModsSelection)
+        print("actionsWithModsNoSelection", actionsWithModsNoSelection)
+        print("actionsWithSelection", actionsWithSelection)
+        print("actionWithoutMods", actionWithoutMods)
 
     activemods, activeSelectionMods = getActiveModifierStates(mousestate, modifierstate)
     if bypassKeyboardModifiers:
@@ -300,7 +292,7 @@ def executeActionString(uievent, action, context, bypassKeyboardModifiers=False,
         activemods = currentmods
 
     if debug:
-        print ("active modes", activemods, activeSelectionMods)
+        print("active modes", activemods, activeSelectionMods)
 
     #   First match the actions with explicit modifiers (Ctrl, Alt, Shift, Space, LMB, RMB, MMB)
     for a in actionsWithModsSelection:

@@ -16,7 +16,7 @@ currentdir = os.path.dirname(os.path.realpath('__file__'))
 def __reload_pythonlibs(showstatus=True):
     if showstatus:
         print("Reloading overlay network editor...")
-    importlib.reload(utility_overlay_network_editor)
+    importlib.reload(utilityOverlayNetworkEditor)
     importlib.reload(DigitalAsset)
 
 
@@ -53,6 +53,25 @@ class ViewportOutlineWidget(QtWidgets.QWidget):
         all = QtGui.QRegion(0, 0, w, h)
         inside = QtGui.QRegion(self.thickness, self.thickness, w - 2 * self.thickness, h - 2 * self.thickness)
         self.setMask(all.subtracted(inside))
+
+
+def moveResizeOverlayNetworkEditor():
+    if getSessionVariable("overlayNetworkEditorCallbackSuspended") == False:
+        viewport = getSessionVariable("viewportWidget").qtWindow()
+        if viewport.isVisible() and hasattr(hou.session, "animatrix_overlay_network_editor"):
+            size = viewport.size()
+            pos = viewport.mapToGlobal(QtCore.QPoint(0, 0))
+
+            if getSessionVariable("useVolatileSpaceToToggleNetworkEditor") and getSessionVariable("spaceKeyIsDown"):
+                size = QtCore.QSize(1, 1)
+
+            topMaskHeight = getSessionVariable("networkEditorTopMaskHeight")
+            xOffsetCorrection = getSessionVariable("networkEditorXOffsetCorrection")
+
+            overlayNE = hou.session.animatrix_overlay_network_editor
+            if shiboken2.isValid(overlayNE) and overlayNE and overlayNE.windowIconText() == "visible":
+                overlayNE.resize(size.width(), size.height() + topMaskHeight)
+                overlayNE.move(pos.x() + xOffsetCorrection, pos.y() - topMaskHeight)
 
 
 def updateUIElements():
@@ -106,26 +125,8 @@ def createNewFloatingNetworkEditor():
     editor.pane().setShowPaneTabs(False)
 
 
-def moveResizeOverlayNetworkEditor():
-    if getSessionVariable("overlayNetworkEditorCallbackSuspended") == False:
-        viewport = getSessionVariable("viewportWidget").qtWindow()
-        if viewport.isVisible() and hasattr(hou.session, "animatrix_overlay_network_editor"):
-            size = viewport.size()
-            pos = viewport.mapToGlobal(QtCore.QPoint(0, 0))
-
-            if getSessionVariable("useVolatileSpaceToToggleNetworkEditor") and getSessionVariable("spaceKeyIsDown"):
-                size = QtCore.QSize(1, 1)
-
-            topMaskHeight = getSessionVariable("networkEditorTopMaskHeight")
-            xOffsetCorrection = getSessionVariable("networkEditorXOffsetCorrection")
-
-            overlayNE = hou.session.animatrix_overlay_network_editor
-            if shiboken2.isValid(overlayNE) and overlayNE and overlayNE.windowIconText() == "visible":
-                overlayNE.resize(size.width(), size.height() + topMaskHeight)
-                overlayNE.move(pos.x() + xOffsetCorrection, pos.y() - topMaskHeight)
-
-
 def setOverlayNetworkEditorVisible(visible):
+    """设置叠加网络编辑器可见性"""
     overlayNE = hou.session.animatrix_overlay_network_editor
     if overlayNE:
         if visible:
@@ -152,10 +153,12 @@ def initializeNewFloatingNetworkEditorCallback():
 
 
 def initializeNewFloatingNetworkEditor():
+    """初始化新建浮动网络编辑器"""
     hou.ui.addEventLoopCallback(initializeNewFloatingNetworkEditorCallback)
 
 
 def toggleOverlayNetworkEditor(ignoreIntegratedNetworkEditor=False):
+    """切换叠加网络编辑器"""
     desktop = hou.ui.curDesktop()
     if not ignoreIntegratedNetworkEditor:
         paneTab = desktop.findPaneTab("animatrix_network_editor")
@@ -192,6 +195,7 @@ def toggleOverlayNetworkEditor(ignoreIntegratedNetworkEditor=False):
 
 
 def toggleNetworkEditor():
+    """切换网络编辑器"""
     if getSessionVariable("isOverlayNetworkEditorInstalled"):
         setSessionVariable("overlayNetworkEditorCallbackSuspended", True)
 

@@ -21,7 +21,6 @@ hideMainMenuBarAtStartup = True
 hideShelfDockAtStartup = True
 lastStatusMessageTimeInMs = -1
 lastStatusMessageTimeTimeout = 1000
-
 """
 Context-Sensitive Rule-Based Hotkey System Settings
 """
